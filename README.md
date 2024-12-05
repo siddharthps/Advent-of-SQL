@@ -21,9 +21,6 @@ Each challenge solution includes:
 - **Explanation** (if needed): Key insights or learnings.  
 - **Sample Outputs**: Demonstrating the query results.
 
-## Example Challenge  
-One of the early challenges involves Santa's workshop operations, where JSON parsing, mapping values, and assigning categories are used to generate meaningful reports.  
-
 ## Why I’m Participating  
 I’m excited to refine my SQL skills through this creative and festive approach. These challenges provide a structured way to learn while having fun, and they serve as an excellent opportunity to connect with the SQL community.  
 
