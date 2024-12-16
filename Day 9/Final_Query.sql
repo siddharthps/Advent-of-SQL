@@ -1,17 +1,37 @@
-WITH production_trends AS (
-  SELECT
-    production_date,
-    toys_produced,
-    LAG(toys_produced, 1) OVER (ORDER BY production_date) AS previous_day_production,
-    toys_produced - LAG(toys_produced, 1) OVER (ORDER BY production_date) AS production_change,
-    ROUND(
-      ((toys_produced - LAG(toys_produced, 1) OVER (ORDER BY production_date)) / 
-      LAG(toys_produced, 1) OVER (ORDER BY production_date)) * 100, 
-      2
-    ) AS production_change_percentage
-  FROM toy_production
+WITH exercise_averages AS (
+    SELECT 
+        r.reindeer_id,
+        r.reindeer_name,
+        ts.exercise_name,
+        ROUND(AVG(ts.speed_record), 2) AS avg_speed
+    FROM 
+        reindeers r
+    JOIN 
+        training_sessions ts
+    ON 
+        r.reindeer_id = ts.reindeer_id
+    WHERE 
+        r.reindeer_name <> 'Rudolf'  -- Exclude Rudolph
+    GROUP BY 
+        r.reindeer_id, r.reindeer_name, ts.exercise_name
+),
+highest_averages AS (
+    SELECT 
+        reindeer_id,
+        reindeer_name,
+        MAX(avg_speed) AS highest_avg_speed
+    FROM 
+        exercise_averages
+    GROUP BY 
+        reindeer_id, reindeer_name
 )
-SELECT *
-FROM production_trends
-WHERE previous_day_production IS NOT NULL
-ORDER BY production_change_percentage DESC;
+SELECT 
+    reindeer_name,
+    highest_avg_speed
+FROM 
+    highest_averages
+ORDER BY 
+    highest_avg_speed DESC
+LIMIT 3;
+
+

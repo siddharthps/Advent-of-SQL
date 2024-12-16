@@ -1,17 +1,25 @@
-WITH production_trends AS (
-  SELECT
-    production_date,
-    toys_produced,
-    LAG(toys_produced, 1) OVER (ORDER BY production_date) AS previous_day_production,
-    toys_produced - LAG(toys_produced, 1) OVER (ORDER BY production_date) AS production_change,
-    ROUND(
-      ((toys_produced - LAG(toys_produced, 1) OVER (ORDER BY production_date)) / 
-      LAG(toys_produced, 1) OVER (ORDER BY production_date)) * 100, 
-      2
-    ) AS production_change_percentage
-  FROM toy_production
+WITH RECURSIVE staff_table AS (
+    SELECT 
+        staff_id, 
+        staff_name, 
+        manager_id, 
+        1 AS level, 
+        CAST(staff_id AS CHAR) AS path  -- Initialize the path with the current staff_id
+    FROM staff
+    WHERE manager_id IS NULL
+    UNION ALL
+    SELECT 
+        s.staff_id, 
+        s.staff_name, 
+        s.manager_id, 
+        st.level + 1, 
+        CONCAT(st.path, ',', s.staff_id) AS path -- Append the current staff_id to the parent's path
+    FROM staff s
+    INNER JOIN staff_table st
+    ON s.manager_id = st.staff_id
 )
-SELECT *
-FROM production_trends
-WHERE previous_day_production IS NOT NULL
-ORDER BY production_change_percentage DESC;
+SELECT staff_id, staff_name, level, path
+FROM staff_table
+ORDER BY level DESC, staff_id
+LIMIT 1;  -- Get the most over-managed employee
+
